@@ -3,75 +3,67 @@ import time
 import streamlit as st
 import json
 import platform
+from PIL import Image
 
-# Muestra la versión de Python junto con detalles adicionales
+# Mostrar la versión de Python
 st.write("Versión de Python:", platform.python_version())
 
-values = 0.0
-act1="OFF"
+# Mostrar imagen principal (botón decorativo)
+image = Image.open("boton.jpeg")
+st.image(image, caption="Controlador principal", use_container_width=True)
 
-def on_publish(client,userdata,result):             #create function for callback
-    print("el dato ha sido publicado \n")
+values = 0.0
+act1 = "OFF"
+
+def on_publish(client, userdata, result):
+    print("El dato ha sido publicado\n")
     pass
 
 def on_message(client, userdata, message):
     global message_received
     time.sleep(2)
-    message_received=str(message.payload.decode("utf-8"))
+    message_received = str(message.payload.decode("utf-8"))
     st.write(message_received)
 
-        
-
-
-broker="broker.mqttdashboard.com"
-port=1883
-client1= paho.Client("GIT-HUB")
+broker = "broker.mqttdashboard.com"
+port = 1883
+client1 = paho.Client("GIT-HUB")
 client1.on_message = on_message
 
+st.title("CONTROL POR BOTÓN 💥")
 
-
-st.title("MQTT Control")
-
-if st.button('ON'):
-    act1="ON"
-    client1= paho.Client("Camilag")                           
-    client1.on_publish = on_publish                          
-    client1.connect(broker,port)  
-    message =json.dumps({"Act1":act1})
-    ret= client1.publish("cmqtt_camilag", message)
- 
-    #client1.subscribe("Sensores")
-    
-    
+# Botón ON
+if st.button('🔴 ENCENDER'):
+    act1 = "ON"
+    client1 = paho.Client("Camilag")
+    client1.on_publish = on_publish
+    client1.connect(broker, port)
+    message = json.dumps({"Act1": act1})
+    ret = client1.publish("cmqtt_camilag", message)
 else:
     st.write('')
 
-if st.button('OFF'):
-    act1="OFF"
-    client1= paho.Client("Camilag")                           
-    client1.on_publish = on_publish                          
-    client1.connect(broker,port)  
-    message =json.dumps({"Act1":act1})
-    ret= client1.publish("cmqtt_camilag", message)
-  
-    
+# Botón OFF
+if st.button('⚪ APAGAR'):
+    act1 = "OFF"
+    client1 = paho.Client("Camilag")
+    client1.on_publish = on_publish
+    client1.connect(broker, port)
+    message = json.dumps({"Act1": act1})
+    ret = client1.publish("cmqtt_camilag", message)
 else:
     st.write('')
 
-values = st.slider('Selecciona el rango de valores',0.0, 100.0)
-st.write('Values:', values)
+# Slider de valores
+values = st.slider('Selecciona el rango de valores', 0.0, 100.0)
+st.write('Valor seleccionado:', values)
 
-if st.button('Enviar valor analógico'):
-    client1= paho.Client("Camilag")                           
-    client1.on_publish = on_publish                          
-    client1.connect(broker,port)   
-    message =json.dumps({"Analog": float(values)})
-    ret= client1.publish("cmqtt_cami", message)
-    
- 
+# Botón para enviar valor analógico
+if st.button('📡 Enviar valor analógico'):
+    client1 = paho.Client("Camilag")
+    client1.on_publish = on_publish
+    client1.connect(broker, port)
+    message = json.dumps({"Analog": float(values)})
+    ret = client1.publish("cmqtt_cami", message)
 else:
     st.write('')
-
-
-
-
